@@ -5,6 +5,9 @@ import { createButton } from './Button';
 export default {
   title: 'Example/Component/Button',
   tags: ['autodocs'],
+  // docs: {
+  //   autodocs: false
+  // },
 
   /**
    * You can either use a function to create DOM elements or use a plain html string!
@@ -22,7 +25,11 @@ export default {
     backgroundColor: { control: 'color' },
     label: { control: 'text' },
     onClick: { action: 'onClick' },
-    primary: { control: 'boolean' },
+    // primary: { control: 'boolean' },
+    variation: {
+      control: { type: 'select' },
+      options: ['primary', 'secondary', 'success', 'warning', 'danger'],
+    },
     size: {
       control: { type: 'select' },
       options: ['small', 'medium', 'large'],
@@ -35,14 +42,23 @@ export default {
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Primary = {
   args: {
-    primary: true,
+    // primary: true,
     label: 'ボタン',
+    variation: 'primary',
   },
 };
 
 export const Secondary = {
   args: {
     label: 'Button',
+    variation: 'secondary',
+  },
+};
+
+export const Success = {
+  args: {
+    label: 'Button',
+    variation: 'success',
   },
 };
 
