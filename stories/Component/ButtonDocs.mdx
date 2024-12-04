@@ -1,0 +1,30 @@
+import { Meta, Primary, Controls, Story } from '@storybook/blocks';
+import * as ButtonStories from './Button.stories';
+
+<Meta of={ButtonStories} />
+
+# Button
+ボタンは即座にアクションを開始します。
+
+多くの用途に利用でき、カスタマイズ性の高いボタンは、ユーザーがタスクの実行に日常的に使うシンプルなコンポーネントです。
+ユーザーと触れる機会が1番近い。
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Stories
+
+### Primary
+
+A button can be of primary importance.
+
+<Story of={ButtonStories.Primary} />
+
+A button can be of secondary importance.
+
+<Story of={ButtonStories.Secondary} />
+
+{/* ... */}
