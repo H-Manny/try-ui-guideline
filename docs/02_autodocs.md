@@ -185,3 +185,123 @@ export default {
 > [!TIP]
 > 単一のコンポーネントのドキュメントページを上書きしたい場合は、*MDX*ファイルを作成し、`<Meta title="..." />`などのメタタグを直接記述する方法がおすすめです。*Doc Block*を経由する方法もありますが、MDXのメタタグを使う方がより柔軟で、直接的な記述が可能です。
 
+### Generate a table of contents : 目次の作成
+Storybookが自動生成するドキュメントページは非常に長く、目的の情報を探しにくいことがあります。<br />
+目次機能を有効にすると、ドキュメントページに目次が表示され、目的のセクションへ簡単に移動できるようになります。
+
+この機能を有効にするには、Storybookの設定ファイル（`.storybook/preview.js|ts`）を編集し、`docs.toc`を*true*に設定します。
+
+*JS: .storybook/preview.jsx*
+```javascript
+export default {
+  parameters: {
+    docs: {
+      toc: true, // 👈 Enables the table of contents
+    },
+  },
+};
+```
+
+### Configure the table of contents : 目次の設定
+デフォルトでは、ドキュメントページの目次には、自動的に生成された見出しの一部しか表示されません。<br />
+しかし、目次をカスタマイズして、*tocプロパティ*にパラメータを追加し、表示する見出しのレベルや目次全体の構造を調整することができます。
+
+| Option | Description |
+| --- | --- |
+| disable | ドキュメントページの目次を隠す<br />`toc: { disable: true }` |
+| headingSelector | 目次の見出しリストを定義します。<br />`toc: { headingSelector: 'h1, h2, h3' }` |
+| ignoreSelector | 特定の見出しやストーリーを無視するように目次を設定します。<br />デフォルトでは、目次はストーリーブロック内のすべてのコンテンツを無視します。<br />`toc: { ignoreSelector: '.docs-story h2' }` |
+| title | 目次のタイトルキャプションを定義します。*文字列*、*null*、React要素のいずれかを受け入れます。<br />`toc: { title: 'Table of Contents' }` |
+| unsafeTocbotOptions | TocBot設定オプションの追加<br />`toc: { unsafeTocbotOptions: { orderedList: true } }` |
+
+> [!NOTE]
+> *contentsSelector*, *headingSelector*, *ignoreSelector*プロパティでさらにカスタマイズできます。<br />
+> 詳しくは**Tocbotのドキュメント**を参照してください。
+
+*JS: .storybook/preview.jsx*
+```javascript
+export default {
+  parameters: {
+    docs: {
+      toc: {
+        contentsSelector: '.sbdocs-content',
+        headingSelector: 'h1, h2, h3',
+        ignoreSelector: '#primary',
+        title: 'Table of Contents',
+        disable: false,
+        unsafeTocbotOptions: {
+          orderedList: false,
+        },
+      },
+    },
+  },
+};
+```
+#### Component-level configuration
+特定のストーリーの目次をカスタマイズしたい場合は、そのストーリーのメタデータに**toc**プロパティを追加し、詳細な設定を行います。
+例えば、特定のストーリーの目次を隠す必要がある場合、ストーリーを以下のように調整する：
+
+*JS: MyComponent.stories.js*
+```javascript
+import { MyComponent } from './MyComponent';
+
+export default {
+  component: MyComponent,
+  tags: ['autodocs'],
+  parameters: {
+    docs: {
+      toc: {
+        disable: true, // 👈 Disables the table of contents
+      },
+    },
+  },
+};
+```
+### Customize component documentation
+Storybookの自動ドキュメント機能（*Autodocs*）は、開発効率を向上させる便利なツールですが、<br />
+より詳細な情報を提供したい場合や、ドキュメントの構造を細かく制御したい場合は、*MDX*とStorybookの*Doc Blocks*を組み合わせたカスタムドキュメントを作成することをおすすめします。
+
+## Advanced configuration : 高度な設定
+### 複数のコンポーネントの文書化
+複数のコンポーネントを一緒に文書化すると便利な場合があります。 例えば、コンポーネント・ライブラリの*ButtonGroupコンポーネント*と*Buttonコンポーネント*は、互いに存在しなければ意味をなさないかもしれません。
+
+*Autodocs*では、**メイン**となるコンポーネントとその関連する部品（サブコンポーネント）をまとめてドキュメント化できます。
+
+*JS: List.stories.js|jsx* :eyes:
+```javascript
+// Assuming List and ListItem are defined as functions or classes
+function List(props) {
+  // implementation
+}
+
+function ListItem(props) {
+  // implementation
+}
+
+// Equivalent to the Storybook configuration
+const storyConfig = {
+  component: List,
+  subcomponents: { ListItem },
+};
+
+// Equivalent to the Empty story
+const emptyStory = {};
+
+// Equivalent to the OneItem story
+const oneItemStory = {
+  render: (args) => {
+    const list = document.createElement('div');
+    list.innerHTML = `
+      <div>
+        <div></div>
+      </div>
+    `;
+    return list;
+  },
+};
+```
+![Subcomponents in ArgTypes doc block](https://storybook.js.org/docs-assets/8.4/writing-stories/doc-block-arg-types-subcomponents-for-list.png)
+
+メインとなるコンポーネントとその部品（サブコンポーネント）は、それぞれタブで区切って表示されます。<br />
+各タブの名前は、部品ごとに設定した名前になります。<br />
+複数のコンポーネントをまとめて、より複雑なドキュメントを作成したい場合は、*MDX*を使用すると柔軟にカスタマイズできます。
