@@ -1,0 +1,50 @@
+---
+title: MDX
+description: MDXファイルはMarkdownとJavaScript/JSXを組み合わせて、リッチなインタラクティブドキュメントを作成します。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+
+
+**MDX**は、MarkdownとJavaScript/JSXを組み合わせることで、リッチでインタラクティブなドキュメントを作成するためのファイル形式です。<br />
+Storybookでは、このMDXを使用して、コンポーネントのドキュメントやガイドラインを作成できます。
+
+## 1. MDXの主な特徴
+
+* **MarkdownとJSXの統合**: `# heading`のようなMarkdownの読みやすい構文を使用しながら、**JSX**（Reactコンポーネント）をファイル内の任意の場所に自由に埋め込むことができます。
+* **ストーリーとの連携**: **Component Story Format (CSF)** で定義されたストーリー（コンポーネントの例）をMDXファイル内に含め、インタラクティブに表示できます。
+* **柔軟なドキュメント作成**: コンポーネントのドキュメントだけでなく、**スタンドアロンのドキュメントページ**（例：ガイドライン、ベストプラクティス）を作成し、Storybookに追加できます。
+
+## 2. 主要なDoc Blocks
+
+`@storybook/addon-docs`からインポートできる特定のコンポーネント（**Doc Blocks**）を使って、ドキュメントにStorybookの機能を取り込みます。
+
+| Doc&nbsp;Block&emsp; | 機能 |
+| :--- | :--- |
+| **`<Meta>`** | ドキュメントのサイドバーでの配置や、ドキュメント化するストーリーファイルを定義します。 |
+| **`<Canvas>`** | ストーリーをインタラクティブなキャンバスとしてレンダリングします。 |
+| **`<Story>`** | 特定のストーリーのプレビューをレンダリングします。 |
+| **`<Controls>`** | コンポーネントのプロパティ（Args）を操作するためのコントロールパネルを表示します。 |
+| **`<Markdown>`** | 既存のMarkdownファイルをインポートしてレンダリングするために使用します。 |
+
+## 3. MDXとCSFの役割分担
+
+* **CSF (Component Story Format)**: コンポーネントの可能な状態（例）を簡潔に定義するのに優れています。型安全性の確保にも役立ちます。
+* **MDX**: 構造化されたドキュメントを記述し、インタラクティブな**JSX要素**（ストーリーを含む）を構成するのに優れています。
+
+## 4. カスタムドキュメントのセットアップ
+
+* **設定ファイルの更新**: `.storybook/main.js|ts` の `stories` 配列にMDXファイルへのパス（例：`../src/**/*.mdx`）を追加し、`@storybook/addon-docs` を `addons` に含める必要があります。
+* **非付属ドキュメント**: `<Meta title="..." />` を使用することで、特定のコンポーネントのストーリーに紐づかない、**純粋なドキュメントページ**（ガイドラインなど）を作成できます。
+
+## 5. 既知の制限とトラブルシューティング
+
+* **Reactのみのサポート**: StorybookのMDX実装は、ドキュメントのレンダリングに**Reactのみ**を使用します。
+* **Markdownテーブルの非表示**: Markdownテーブルなどの特定の拡張機能を使用するには、`remark-gfm`プラグインをStorybookの設定に追加する必要がある場合があります。
+
+<div
+  style="margin-block-start: 48px;">
+  <LinkCard
+    title="Storybook MDX Docs"
+    href="https://storybook.js.org/docs/writing-docs/mdx"
+    target={'_blank'} />
+</div>
