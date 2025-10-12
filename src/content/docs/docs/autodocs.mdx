@@ -1,0 +1,91 @@
+---
+title: Autodocs
+description: Storybook Autodocsは、UIコンポーネントの包括的なドキュメントを素早く生成するのに役立つ強力なツールです。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+Storybook Autodocsは、コンポーネントのストーリー（CSFファイル）を活用して、包括的なドキュメントページを**自動的に生成**する強力な機能です。これにより、コンポーネントの機能に関する情報を明確かつ簡潔に提供する、生きたドキュメントを作成できます。
+
+## 1. Autodocsの基本機能
+
+* **自動生成**: Storybookはストーリーのメタデータ（`args`、`argTypes`、`parameters`など）を推論し、その情報に基づいてドキュメントページを自動生成します。
+* **配置**: 生成されたドキュメントページは、通常、サイドバーのコンポーネントツリーのルートレベルに配置されます。
+
+## 2. 自動ドキュメントの設定方法
+
+Autodocsは**タグ**を使用して有効化します。
+
+| 設定場所 | 設定方法 | 適用範囲 |
+| :--- | :--- | :--- |
+| **グローバル** | `.storybook/preview.js|ts` のtagsに `['autodocs']` を追加 | プロジェクト内の**すべてのストーリー** |
+| **コンポーネントレベル** | ストーリーの `meta` オブジェクトの `tags` に `['autodocs']` を追加 | **そのコンポーネント**のすべてのストーリー |
+| **除外** | `tags` に `['!autodocs']` を追加 | ドキュメントの**生成を無効化**、または特定の**ストーリーをドキュメントから除外** |
+
+**グローバル：** `.storybook/preview.js|ts`
+```javascript
+// .storybook/preview.js
+
+export default {
+  // ...rest of preview
+  //👇 Enables auto-generated documentation for all stories
+  tags: ['autodocs'],
+};
+```
+**コンポーネントレベル**
+```javascript
+// Button.stories.js
+
+import { Button } from './Button';
+
+export default {
+  component: Button,
+  //👇 Enables auto-documentation for this component and includes all stories here.
+  tags: ['autodocs'],
+};
+```
+
+
+## 3. 自動生成されるドキュメントの構成
+
+デフォルトの自動ドキュメントページは、主に以下のDoc Blocksで構成されます。
+
+1.  **`<Title>`、`<Subtitle>`、`<Description>`**: コンポーネントのメタデータからのヘッダー情報。
+2.  **`<Primary>`**: ファイルで最初に定義されたストーリー（メインの例）と、ズームなどのUIコントロール。
+3.  **`<Controls>`**: ストーリーで定義されたArgs（プロパティ）を操作するためのインタラクティブなテーブル。
+4.  **`<Stories>`**: ファイル内の残りのすべてのストーリーの概要。
+
+## 4. カスタマイズと拡張
+
+Autodocsは柔軟にカスタマイズ・拡張できます。
+
+* **カスタムテンプレート**:
+    `.storybook/preview.js|ts`で`parameters.docs.page`に関数を定義し、*Doc Blocks*を組み合わせて**独自のドキュメントテンプレート**を作成できます。
+* **MDXテンプレート**:
+    React以外のプロジェクトでは、`Meta`ブロックに`isTemplate`プロパティを設定したMDXファイルをテンプレートとして使用できます。
+  <Aside>
+    単一のコンポーネントのドキュメントページのみを上書きする必要がある場合は、MDXファイルを作成し、`<Meta of={} />` ドキュメントブロックで直接参照することをお勧めします。
+  </Aside>
+* **目次（Table of Contents - TOC）**:
+    `parameters.docs.toc: true`を設定することで、ドキュメントページに目次を有効にし、ナビゲーションを改善できます。見出しのレベルやセレクタのカスタマイズも可能です。
+* **複数のコンポーネント**:
+    `meta`に`subcomponents`プロパティを追加することで、メインコンポーネントと一緒にサブコンポーネント（例：`List`と`ListItem`）を*Doc Blocks*で表示できます。
+* **テーマのオーバーライド**:
+    `parameters.docs.theme`でUIテーマを上書きし、デザインシステムに合わせることができます。
+
+## 5. 高度な設定
+
+* **メイン設定でのオプション**: `.storybook/main.js|ts`の`docs`オブジェクトで、ドキュメントページのデフォルト名（`defaultName`）や、ドキュメントモード（`docsMode`）を制御できます。
+* **モノレポでの問題**: モノレポ環境でドキュメントが生成されない場合、コンポーネントをパッケージのルートからではなく、**直接エクスポートファイルからインポート**するよう修正が必要になることがあります。
+
+---
+Autodocsは、コンポーネントのコードに最も近い場所でドキュメントを維持するための強力な基盤となります。
+
+<div
+  style="margin-block-start: 48px;">
+  <LinkCard
+    title="Storybook Autodocs Docs"
+    href="https://storybook.js.org/docs/writing-docs/autodocs"
+    target={'_blank'} />
+</div>

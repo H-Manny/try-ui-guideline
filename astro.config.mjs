@@ -11,11 +11,14 @@ export default defineConfig({
       sidebar: [
         {
           label: 'Docs',
-          autogenerate: { directory: 'docs' },
-          // items: [
-          //   // Each item here is one entry in the navigation menu.
-          //   { label: 'MDX', slug: 'docs/index.mdx' },
-          // ],
+          // autogenerate: { directory: 'docs' },
+          items: [
+            // Each item here is one entry in the navigation menu.
+            { label: 'Autodocs', slug: 'docs/autodocs' },
+            { label: 'MDX', slug: 'docs/mdx' },
+            { label: 'Doc blocks', slug: 'docs/doc-blocks' },
+            { label: 'Code panel', slug: 'docs/code-panel' },
+          ],
         },
         {
           label: 'Guides',

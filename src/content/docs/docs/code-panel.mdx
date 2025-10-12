@@ -1,0 +1,74 @@
+---
+title: Code panel
+description: コードパネルは、キャンバスでストーリーを表示している際に、そのストーリーのソースコードを表示します。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+StorybookのCode panelは、Canvas（キャンバス）ビューでストーリーを表示している際に、そのストーリーの**ソースコード**をレンダリングするための機能です。
+
+<Aside title='Info'>Code panelは、Storybook 9で廃止された **Storysource**アドオンの代替機能です。</Aside>
+
+## 1. 主な機能
+
+  * **ソースコードの表示**: 選択したストーリーのソースコードスニペットを表示します。
+  * **Argsの適用**: ストーリーに定義されている `args`（引数/プロパティ）は、出力されるコード内でその実際の値に置き換えられます。
+
+## 2. Code panel の有効化（Usage）
+
+Code panelを有効にするには、`parameters.docs.codePanel` を `true` に設定します。
+
+### A. グローバルでの有効化（推奨）
+
+ほとんどのプロジェクトでは、`.storybook/preview.js|ts` ファイルで設定し、すべてのストーリーに適用するのが最適です。
+
+```javascript
+// .storybook/preview.js
+
+export default {
+  parameters: {
+    docs: {
+      codePanel: true,
+    },
+  },
+};
+```
+
+### B. コンポーネントまたはストーリーレベルでの設定
+
+特定のコンポーネント全体、または特定のストーリーでのみ有効化・無効化することも可能です。
+
+```typescript
+// Button.stories.ts
+
+/**
+ * このスニペットはHTML用には存在しません。代わりに、Reactのスニペットを以下に示します。
+ */
+
+const meta = {
+  // ...
+  parameters: {
+    docs: {
+      // 👇 このファイル内の全ストーリーで有効化
+      codePanel: true,
+    },
+  },
+} satisfies Meta<typeof Button>;
+
+// ...
+
+export const Secondary: Story = {
+  // ...
+  parameters: {
+    docs: {
+      // 👇 この特定のストーリーでのみ無効化
+      codePanel: false,
+    },
+  },
+};
+```
+
+## 3. 設定（Configuration）
+Code panelは、Autodocsページでも使用される **`Source` Doc block** と同じスニペットをレンダリングします。<br />
+そのため、`Source` Doc block に関連する設定パラメーターを再利用して、コードスニペットの表示をカスタマイズできます。
