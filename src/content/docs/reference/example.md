@@ -1,6 +1,9 @@
 ---
 title: Example Reference
 description: A reference page in my new Starlight docs site.
+draft: true
+sidebar:
+  hidden: true
 ---
 
 Reference pages are ideal for outlining how things work in terse and clear terms.
