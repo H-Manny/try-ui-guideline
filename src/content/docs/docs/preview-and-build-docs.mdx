@@ -1,0 +1,55 @@
+---
+title: Preview and build docs
+description: Storybookは、開発プロセスに関わるあなたやその他の関係者全員を支援する、豊富で詳細なドキュメントを作成することを可能にします。
+sidebar:
+  order: 5
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+Storybookは、作成したコンポーネントのドキュメント（MDXまたはCSFベース）を開発中にプレビューしたり、最終的な静的ドキュメントとしてビルド・公開したりするためのツールを提供しています。
+
+## 1. ドキュメントのプレビュー（Preview Documentation）
+
+開発中にドキュメントをチェックするために、Storybookを**ドキュメントモード**で起動できます。
+
+```json
+// package.json
+{
+  "scripts": {
+    "storybook-docs": "storybook dev --docs"
+  }
+}
+```
+
+### ドキュメントモードの特徴
+
+通常のStorybookビルドとは異なり、ドキュメントモードでは以下のようになります。
+
+* **レイアウトの変更**: Storybookのレイアウトがドキュメント閲覧に特化してレンダリングされます。
+* **ツールバーの非表示**: 通常のツールバー（アドオンパネルなど）は非表示になります。
+* **表示のフラット化**: 個々のストーリーがフラットな表示モードになり、ドキュメント自体に焦点が当たります。
+
+## 2. ドキュメントのビルドと公開（Build and Publish Documentation）
+
+作成したドキュメントを公開可能な静的ファイルとして出力する場合も、`--docs` フラグを使用します。
+
+```json
+// package.json
+{
+  "scripts": {
+    "build-storybook-docs": "storybook build --docs"
+  }
+}
+```
+
+### ビルド後の公開
+
+ビルドされた静的ドキュメントは、以下のようなどんなホスティングプロバイダーでもデプロイして公開できます。
+
+* Vercel
+* Netlify
+* S3 など
+
+ビルドされたドキュメントにも、プレビューモードと同様のレイアウトと表示の制約（ツールバー非表示など）が適用されます。
