@@ -10,15 +10,16 @@ export default defineConfig({
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/H-Manny/try-ui-guideline' }],
       sidebar: [
         {
+          label: 'Stories',
+          items: [
+            // Each item here is one entry in the navigation menu.
+            { label: 'Args', slug: 'stories/args' },
+            { label: 'Parameters', slug: 'stories/parameters' },
+          ],
+        },
+        {
           label: 'Docs',
           autogenerate: { directory: 'docs' },
-          // items: [
-          //   // Each item here is one entry in the navigation menu.
-          //   { label: 'Autodocs', slug: 'docs/autodocs' },
-          //   { label: 'MDX', slug: 'docs/mdx' },
-          //   { label: 'Doc blocks', slug: 'docs/doc-blocks' },
-          //   { label: 'Code panel', slug: 'docs/code-panel' },
-          // ],
         },
         // {
         //   label: 'Guides',

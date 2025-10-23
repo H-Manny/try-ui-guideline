@@ -1,0 +1,40 @@
+---
+title: Args
+description: ストーリーとは、コンポーネントのレンダリング方法を定義する引数のセットを持つコンポーネントです。「Args」は、それらの引数を単一のJavaScriptオブジェクトで定義するためのStorybookの仕組みです。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+Storybookにおける **Args** (Arguments: 引数) は、コンポーネントがどのようにレンダリングされるかを定義する引数のセットを単一のJavaScriptオブジェクトで表現する仕組みです。
+
+Argsは、コンポーネントの **プロパティ (props)**、**スロット (slots)**、**スタイル (styles)**、**インプット (inputs)** などを動的に変更するために使用されます。これにより、Storybookとそのアドオンはコンポーネントをライブで編集することが可能になり、開発者はコンポーネントコード自体を変更することなく、StorybookのUI（特に **Controls** アドオン）を通じてコンポーネントを操作できます。
+
+Argsの値が変更されると、コンポーネントは自動的に再レンダリングされます。
+
+## Argsの定義レベル
+
+Argsオブジェクトは、以下の3つのレベルで定義できます。
+
+| 定義レベル | 説明 |
+| :--- | :--- |
+| **Storyレベル** | 個々のストーリーに特有のArgsを定義します。他のストーリーのArgsを再利用することも可能です。|
+| **Componentレベル** | デフォルトのエクスポート（`meta`オブジェクト）でArgsを定義すると、そのコンポーネントのすべてのストーリーに適用されます。各ストーリーで上書きしない限り、この値が使用されます。|
+| **Globalレベル** | `.storybook/preview.js`または`.storybook/preview.ts`でArgsを定義すると、すべてのコンポーネントのすべてのストーリーに適用されます。ただし、テーマなどのグローバル設定には、ツールバーメニューから変更できる **Globals** の使用が推奨されます。|
+
+## その他の主な特徴
+
+1.  **Argsの構成 (Composition)**: 複数のストーリーのArgsを組み合わせて新しいストーリーのArgsを作成できます。これは、他のコンポーネントから構成される複合コンポーネント（例: `Page`コンポーネント）のストーリーを作成する際に特に有用です。
+2.  **複雑な値のマッピング**: JSX要素など、シリアル化できない複雑な値をArgsとして使用する場合、`argTypes`プロパティの`mapping`機能を使用することで、シンプルな文字列（例: Controlsパネルで選択された値）から複雑な型へ変換できます。
+3.  **URL経由での設定**: URLのクエリパラメータに`args`を追加することで、アクティブなストーリーの初期Argsを上書きできます。（例: `?path=/story/avatar--default&args=style:rounded;size:100`）
+4.  **ストーリー内でのArgsの更新**: インタラクティブなコンポーネント（例: スイッチ）の状態をストーリー内で更新し、StorybookのUIに反映させるために、`storybook/preview-api`からエクスポートされる **`useArgs`** フックを使用できます。
+5.  **アドオンでの利用**: アドオンを作成する際にも、`storybook/manager-api`からエクスポートされる **`useArgs`** フックを使用して、Argsの読み取りや更新が可能です。
+
+
+<div
+  style="margin-block-start: 48px;">
+  <LinkCard
+    title="Storybook Args Docs"
+    href="https://storybook.js.org/docs/writing-stories/args"
+    target={'_blank'} />
+</div>

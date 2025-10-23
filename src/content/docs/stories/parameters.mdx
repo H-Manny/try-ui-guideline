@@ -1,0 +1,93 @@
+---
+title: Parameters
+description: パラメーターは、ストーリーに関する静的で名前付きのメタデータの集合であり、通常はStorybookの機能やアドオンの動作を制御するために使用されます。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+
+
+**Parameters** は、Storybookにおいて、個々のストーリーに関する**静的なメタデータ**を定義するために使用されるオブジェクトです。このメタデータは、コンポーネントの表示や挙動を変更する **Args** とは異なり、主に**Storybookの機能**や**アドオンの動作**を制御するために利用されます。
+
+## 定義レベルと適用範囲
+
+Parametersは、その適用範囲に応じて以下の3つのレベルで定義できます。より具体的なレベルの設定が、より広いレベルの設定を上書きします。
+
+| 定義レベル | 定義場所 | 適用範囲 |
+| :--- | :--- | :--- |
+| **Storyレベル** | 個別のストーリーのエクスポート内に`parameters`キーとして定義。 | その特定のストーリーのみ。 |
+| **Componentレベル** | デフォルトエクスポート（`Meta`オブジェクト）内に`parameters`キーとして定義。 | そのコンポーネントのすべてのストーリー。 |
+| **Globalレベル** | `.storybook/preview.js`または`.ts`内の`parameters`エクスポートとして定義。 | Storybook全体のすべてのストーリー。 |
+
+### Story level parameters:
+```javascript
+// Button.stories.js
+import { Button } from './Button';
+
+export default {
+  component: Button,
+};
+
+export const Primary = {
+  // 👇 Story-level parameters
+  parameters: {
+    backgrounds: {
+      options: {
+        red: { name: 'Red', value: '#f00' },
+        green: { name: 'Green', value: '#0f0' },
+        blue: { name: 'Blue', value: '#00f' },
+      },
+    },
+  },
+};
+```
+### Component level parameters:
+```javascript
+// Button.stories.js
+import { Button } from './Button';
+
+export default {
+  component: Button,
+  //👇 Creates specific parameters at the component level
+  parameters: {
+    backgrounds: {
+      options: {},
+    },
+  },
+};
+```
+### Global level parameters:
+```javascript
+// .storybook/preview.js
+export default {
+  parameters: {
+    backgrounds: {
+      options: {
+        light: { name: 'Light', value: '#fff' },
+        dark: { name: 'Dark', value: '#333' },
+      },
+    },
+  },
+};
+```
+
+## 継承ルール（マージ）
+
+Parametersは、以下のルールに従ってマージされ、適用されます。
+
+1.  **優先度**: **Story** > **Component** > **Global** の順で、より具体的なパラメータが優先されます。
+2.  **マージ**: パラメータはオブジェクトとして**マージ**されます。キー全体が上書きされるのではなく、異なるレベル間で定義された設定が結合されます。これにより、グローバルで一般的な設定を定義しつつ、個別のストーリーで特定のサブパラメータのみを変更することが可能です。
+
+## 主な用途
+
+Parametersの典型的な用途には以下のようなものがあります。
+
+* **アドオンの制御**: `backgrounds`や`viewport`といったアドオンのデフォルト設定や利用可能なオプションリストを定義します。
+* **Storybook機能のカスタマイズ**: `docs`や`actions`などのStorybook組み込み機能の有効/無効、詳細設定を行います。
+
+<div
+  style="margin-block-start: 48px;">
+  <LinkCard
+    title="Storybook Parameters Docs"
+    href="https://storybook.js.org/docs/writing-stories/parameters"
+    target={'_blank'} />
+</div>
