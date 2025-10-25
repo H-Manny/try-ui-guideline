@@ -1,0 +1,91 @@
+---
+title: Decorators
+description: デコレータとは、ストーリーを余分な「レンダリング」機能で包む方法です。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+
+**Decorators** は、ストーリー（コンポーネントのレンダリング）を**追加のレンダリング機能でラップ（包む）**するための仕組みです。これは、コンポーネントが正しくまたは望ましい形で表示されるために必要な**マークアップ**、**コンテキスト**、または**プロバイダー**を提供するために使われます。
+
+Decoratorsは、コンポーネントのロジックから**Storybook独自のセットアップ**を分離し、ストーリー自体を「純粋な」コンポーネントのレンダリング状態に保つことに役立ちます。
+
+## 主な用途
+
+Decoratorsの主な使用目的は以下の通りです。
+
+1.  **追加のマークアップの提供**:
+    * コンポーネントの周囲にマージンやパディングなどのスペースを追加し、見やすくする。
+    * コンポーネントを特定のラッパー要素（例: `<div>`, `<span>`）で囲む。
+2.  **コンテキストやプロバイダーのモック**:
+    * テーマプロバイダー（例: `ThemeProvider`）や国際化（i18n）プロバイダーなど、コンポーネントが依存するアプリケーションレベルのコンテキストを提供し、モックする。
+    * ReduxやRecoilなどの状態管理ライブラリのストアをモックする。
+3.  **アドオンとの連携**:
+    * 多くのアドオン（例: `WithTheme`アドオンなど）は、ストーリーに追加のレンダリングや機能を追加するためにDecoratorsを使用します。
+
+## 定義レベルと継承
+
+DecoratorsもArgsやParametersと同様に、その適用範囲に応じて以下の3つのレベルで定義できます。
+
+| 定義レベル | 定義場所 | 適用範囲 |
+| :--- | :--- | :--- |
+| **Storyレベル** | 個別のストーリーのエクスポート内に`decorators`配列として定義。 | その特定のストーリーのみ。 |
+| **Componentレベル** | デフォルトエクスポート（`Meta`オブジェクト）内に`decorators`配列として定義。 | そのコンポーネントのすべてのストーリー。 |
+| **Globalレベル** | `.storybook/preview.js`または`.ts`内の`decorators`エクスポートとして定義。 | Storybook全体のすべてのストーリー。 |
+
+**継承ルール**:
+
+* より具体的なレベル（Story > Component > Global）で定義されたDecoratorsは、**より広いレベルで定義されたDecoratorsに加えて実行**されます。つまり、Decoratorsは**マージ**され、指定された順序で次々とストーリーをラップしていきます。
+
+## Decorator関数の引数
+
+Decorator関数は、通常2つの引数を受け取ります。
+
+1.  **Story関数（`Story`または`StoryFn`）**: ラップされる対象のストーリーをレンダリングする関数。Decoratorはこの関数を呼び出し、その結果をラップする要素（マークアップやプロバイダー）で囲います。
+2.  **Contextオブジェクト（`context`）**: 現在のストーリーに関するメタデータが含まれます。これには、`args`、`globals`、`parameters`、`viewMode`などが含まれ、Decorator内でこれらの情報に基づいてロジックを適用できます。
+
+## Decoratorsの例 <Badge text="HTML" variant="default" style={{ background: '#FF4785' }} />
+
+HTMLの場合、React や Vue のような JSX を使用せず、代わりに文字列またはDOMノードを返す形式でストーリーとデコレータを記述します。<br />
+以下は、ボタンコンポーネントに余白を追加する簡単な例です：
+
+```javascript
+// Button.stories.js
+
+export default {
+  // HTML では component の import は不要な場合が多い（TypeScript プロジェクトでは型定義やインポートが必要な場合があります）
+  title: 'Example/Button',
+};
+
+export const Primary = {
+  /**
+   * render はストーリーの描画を行う関数。文字列 or DOM ノードを返します。
+   * TypeScript の場合: (args: { label?: string }) => string
+   */
+  render: (args) => `<button class="btn">${args?.label ?? 'Primary'}</button>`,
+  args: { label: 'Primary' },
+
+  /**
+   * decorator は Story() を呼び出す関数として使います（JSX の <Story/> を使わない）
+   * ※TypeScript/JSX (React) の場合は <Story /> コンポーネントとしてラップしますが、HTML では Story() 関数を呼び出して結果をラップします。
+   */
+  decorators: [
+    (Story) => {
+      // Story() が文字列を返す場合は文字列を組み合わせるのが簡単
+      return `<div style="margin: 3em;">${Story()}</div>`;
+    },
+  ],
+};
+```
+
+このデコレータは、ストーリーのレンダリング結果を3emのマージンを持つ `div` 要素でラップします。<br />
+HTMLの場合は、`Story` 関数は文字列またはDOMノードを返すことができ、それに応じてデコレータ内での処理方法を調整する必要があります。
+
+<div
+  style="margin-block-start: 48px;">
+  <LinkCard
+    title="Storybook Decorators Docs"
+    href="https://storybook.js.org/docs/writing-stories/decorators"
+    target={'_blank'} />
+</div>

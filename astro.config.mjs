@@ -15,6 +15,7 @@ export default defineConfig({
             // Each item here is one entry in the navigation menu.
             { label: 'Args', slug: 'stories/args' },
             { label: 'Parameters', slug: 'stories/parameters' },
+            { label: 'Decorators', slug: 'stories/decorators' },
           ],
         },
         {
