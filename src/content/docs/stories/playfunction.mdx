@@ -1,0 +1,111 @@
+---
+title: Play function
+description: Storyがレンダリングされた直後に実行される小さなコードスニペットです。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+
+
+**Play function** は、ストーリーがレンダリングされた**直後**に実行される小さなコードスニペットです。
+
+この機能の目的は、通常ユーザーによる操作が必要なシナリオ（例：フォームの入力、ボタンのクリックなど）をコードで自動的に実行し、コンポーネントの**インタラクション（相互作用）と状態変化**をテストすることにあります。
+
+Play functionが実行されると、その手順はStorybookの **Interactionsパネル** にステップ・バイ・ステップで表示され、デバッグや検証が容易になります。
+
+### 主な機能と手順
+
+#### 1\. Play functionの定義 <Badge text="HTML" variant="default" style={{ background: '#FF4785', border: 'unset' }} />
+Play functionは、個々のストーリーのエクスポート内に `play` キーとして非同期関数（`async`）で定義します。
+```javascript
+// RegistrationForm.stories.js
+import { RegistrationForm } from './RegistrationForm';
+
+export default {
+  component: RegistrationForm,
+};
+
+/*
+ * See https://storybook.js.org/docs/writing-stories/play-function#working-with-the-canvas
+ * to learn more about using the canvas to query the DOM
+ */
+export const FilledForm = {
+  play: async ({ canvas, userEvent }) => {
+    const emailInput = canvas.getByLabelText('email', {
+      selector: 'input',
+    });
+
+    await userEvent.type(emailInput, 'example-email@email.com', {
+      delay: 100,
+    });
+
+    const passwordInput = canvas.getByLabelText('password', {
+      selector: 'input',
+    });
+
+    await userEvent.type(passwordInput, 'ExamplePassword', {
+      delay: 100,
+    });
+
+    const submitButton = canvas.getByRole('button');
+    await userEvent.click(submitButton);
+  },
+};
+```
+
+#### 2\. DOM操作のためのCanvasとTesting Library
+
+* Play functionは、引数として**Contextオブジェクト**を受け取ります。この中に含まれる主なプロパティは以下の通りです。
+
+    * **`canvas`**: ストーリーがレンダリングされているDOM要素のルートをスコープとした、[Testing Library](https://testing-library.com/)のクエリ（`getByRole`, `getByLabelText`など）を提供します。これにより、コンポーネントの内部要素を安全に検索できます。
+    * **`userEvent`**: ユーザー操作をシミュレートするためのユーティリティ（例：`userEvent.type()`で入力、`userEvent.click()`でクリック）を提供します。
+    * **`context`**: ストーリー全体のメタデータ（Args、Parametersなど）が含まれます。
+
+* **Canvasの外側の要素のクエリ**: ストーリーのルート要素の外側（例：グローバルなダイアログやモーダル）をクエリする必要がある場合は、`storybook/test`からエクスポートされる `screen` オブジェクトを使用できます。
+
+#### 3\. ストーリーの合成 (Composing Stories)
+**Play function** は、他のストーリーのPlay functionを呼び出すことで**合成**できます。これにより、複雑なユーザーワークフローを複数の小さなテストステップに分割し、コードの重複を減らすことができます。
+```javascript
+// MyComponent.stories.js
+import { MyComponent } from './MyComponent';
+
+export default {
+  component: MyComponent,
+};
+
+/*
+ * See https://storybook.js.org/docs/writing-stories/play-function#working-with-the-canvas
+ * to learn more about using the canvas to query the DOM
+ */
+export const FirstStory = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByTestId('an-element'), 'example-value');
+  },
+};
+
+export const SecondStory = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.type(canvas.getByTestId('other-element'), 'another value');
+  },
+};
+
+export const CombinedStories = {
+  play: async ({ context, canvas, userEvent }) => {
+    // このストーリーのPlay functionを実行する前に、FirstStoryとSecondStoryのPlay functionを実行します
+    await FirstStory.play(context);
+    await SecondStory.play(context);
+    await userEvent.type(canvas.getByTestId('another-element'), 'random value');
+  },
+};
+```
+
+### 役割
+Play functionは、Storybookを単なるUIドキュメントツールから、**インタラクションテストツール**へと進化させます。これにより、開発者はStorybook環境内でコンポーネントがイベントに正しく応答し、期待どおりの状態に遷移することを、手動操作なしで自動的に検証できます。
+
+<div
+  style="margin-block-start: 48px;">
+  <LinkCard
+    title="Storybook Play function Docs"
+    href="https://storybook.js.org/docs/9/writing-stories/play-function"
+    target={'_blank'} />
+</div>

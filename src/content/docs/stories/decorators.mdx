@@ -45,7 +45,7 @@ Decorator関数は、通常2つの引数を受け取ります。
 1.  **Story関数（`Story`または`StoryFn`）**: ラップされる対象のストーリーをレンダリングする関数。Decoratorはこの関数を呼び出し、その結果をラップする要素（マークアップやプロバイダー）で囲います。
 2.  **Contextオブジェクト（`context`）**: 現在のストーリーに関するメタデータが含まれます。これには、`args`、`globals`、`parameters`、`viewMode`などが含まれ、Decorator内でこれらの情報に基づいてロジックを適用できます。
 
-## Decoratorsの例 <Badge text="HTML" variant="default" style={{ background: '#FF4785' }} />
+## Decoratorsの例 <Badge text="HTML" variant="default" style={{ background: '#FF4785', border: 'unset' }} />
 
 HTMLの場合、React や Vue のような JSX を使用せず、代わりに文字列またはDOMノードを返す形式でストーリーとデコレータを記述します。<br />
 以下は、ボタンコンポーネントに余白を追加する簡単な例です：

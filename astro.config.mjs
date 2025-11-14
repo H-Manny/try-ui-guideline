@@ -16,6 +16,7 @@ export default defineConfig({
             { label: 'Args', slug: 'stories/args' },
             { label: 'Parameters', slug: 'stories/parameters' },
             { label: 'Decorators', slug: 'stories/decorators' },
+            { label: 'Play function', slug: 'stories/playfunction' },
           ],
         },
         {
