@@ -18,6 +18,7 @@ export default defineConfig({
             { label: 'Decorators', slug: 'stories/decorators' },
             { label: 'Play function', slug: 'stories/playfunction' },
             { label: 'Loaders', slug: 'stories/loaders' },
+            { label: 'Tags', slug: 'stories/tags' },
           ],
         },
         {

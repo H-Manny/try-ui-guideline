@@ -1,0 +1,291 @@
+---
+title: Tags
+description: Storybookのストーリーを分類し、表示やテスト実行を制御するために使用されるタグの機能、組み込みタグ、およびカスタムタグの定義方法について解説します。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+
+**タグ**は、Storybook内で利用可能な**ストーリー全体**の中から、どのストーリーを含めるか、または除外するかを制御するための仕組みです。これにより、同じストーリーのセットに対して、異なる目的（例えば、サイドバーへの表示、テストランナーでの実行など）を持たせることができます。
+
+## 組み込みタグ
+
+Storybookプロジェクトでは、以下の**組み込みタグ**がデフォルトで提供されています。
+
+| タグ名 | デフォルトで適用されるか | 説明 |
+| :--- | :--- | :--- |
+| `dev` | はい | Storybookのサイドバーに**ストーリーをレンダリング**するために使用されます。 |
+| `test` | はい | テストランナーやVitestアドオン実行時に**ストーリーを含める**ために使用されます。 |
+| `autodocs` | いいえ | ドキュメントページに**ストーリーを含める**ために使用されます。このタグがないコンポーネントのCSFファイルからは、ドキュメントページは生成されません。 |
+
+<Aside title='補足'>`dev`と`test`タグは、プロジェクト内の**すべてのストーリー**に暗黙的に（デフォルトで）適用されます。</Aside>
+
+## タグの適用と削除
+
+タグは、組み込みタグまたはカスタムタグにかかわらず、静的な文字列でなければなりません。
+
+タグを適用するには、**プロジェクト**、**コンポーネント（メタ）**、または**ストーリー**の各レベルで、`tags`プロパティに文字列の配列を割り当てます。タグは上位レベルから継承されます。
+
+### プロジェクトレベルでの適用
+
+すべてのストーリーにタグを適用するには、`.storybook/preview.js|ts`を使用します。
+
+<Tabs>
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript
+    // .storybook/preview.js
+    export default {
+      // ...rest of preview
+      /*
+      * All stories in your project will have these tags applied:
+      * - autodocs
+      * - dev (implicit default)
+      * - test (implicit default)
+      */
+      tags: ['autodocs'],
+    };
+    ```
+  </TabItem>
+  <TabItem label="TypeScript" icon="seti:typescript">
+    ```typescript
+    // .storybook/preview.ts
+    import type { Preview } from '@storybook/your-framework';
+
+    const preview: Preview = {
+      // ...省略
+      // 👇 すべてのストーリーに'autodocs'が適用されます
+      tags: ['autodocs'],
+    };
+
+    export default preview;
+    ```
+  </TabItem>
+</Tabs>
+
+### コンポーネントレベルとストーリーレベルでの適用
+
+コンポーネントストーリーファイル（CSF）内での適用例です。
+
+<Tabs>
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript
+    // button.stories.js
+    import { Button } from './Button';
+
+    export default {
+      component: Button,
+      /*
+      * All stories in this file will have these tags applied:
+      * - autodocs
+      * - dev (implicit default, inherited from preview)
+      * - test (implicit default, inherited from preview)
+      */
+      tags: ['autodocs'],
+    };
+
+    export const ExperimentalFeatureStory = {
+      /*
+      * This particular story will have these tags applied:
+      * - experimental
+      * - autodocs (inherited from meta)
+      * - dev (inherited from meta)
+      * - test (inherited from meta)
+      */
+      tags: ['experimental'],
+    };
+    ```
+  </TabItem>
+  <TabItem label="TypeScript" icon="seti:typescript">
+    ```typescript
+    // button.stories.ts
+    // Replace your-framework with the framework you are using, e.g. react-vite, nextjs, vue3-vite, etc.
+    import type { Meta, StoryObj } from '@storybook/your-framework';
+
+    import { Button } from './Button';
+
+    const meta = {
+      component: Button,
+      /*
+      * All stories in this file will have these tags applied:
+      * - autodocs
+      * - dev (implicit default, inherited from preview)
+      * - test (implicit default, inherited from preview)
+      */
+      tags: ['autodocs'],
+    } satisfies Meta<typeof Button>;
+
+    export default meta;
+    type Story = StoryObj<typeof meta>;
+
+    export const ExperimentalFeatureStory: Story = {
+      /*
+      * This particular story will have these tags applied:
+      * - experimental
+      * - autodocs (inherited from meta)
+      * - dev (inherited from meta)
+      * - test (inherited from meta)
+      */
+      tags: ['experimental'],
+    };
+    ```
+  </TabItem>
+</Tabs>
+
+### タグの削除（除外）
+
+ストーリーからタグを削除（除外）するには、タグ名の前に **`!`** をプレフィックスとして付けます。
+
+<Tabs>
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript
+    // button.stories.js
+    // Button.js から Button コンポーネントをインポートします
+    import { Button } from './Button';
+
+    // メタデータオブジェクトを定義します
+    const meta = {
+      // Storybook に使用するコンポーネントを伝えます
+      component: Button,
+      // 👇 このファイルのすべてのストーリーに適用されるタグ
+      tags: ['stable'],
+    };
+
+    // このメタデータをデフォルトエクスポートとして設定します
+    export default meta;
+
+    // ExperimentalFeatureStory を定義します
+    export const ExperimentalFeatureStory = {
+      //👇 この特定のストーリーに対して、継承された 'stable' タグを削除し、'experimental' タグを適用します
+      tags: ['!stable', 'experimental'],
+      // 必要な場合はここに引数 (args) を追加します
+      // args: {
+      //   label: 'Experimental Button',
+      // },
+    };
+    ```
+  </TabItem>
+  <TabItem label="TypeScript" icon="seti:typescript">
+    <Aside type="caution" title="注意">このスニペットはHTML用には存在しません。<br />代わりに、Reactのスニペットを以下に示します。</Aside>
+
+    ```typescript
+    // button.stories.ts
+    // Replace your-framework with the framework you are using, e.g. react-vite, nextjs, etc.
+    import type { Meta, StoryObj } from '@storybook/your-framework';
+
+    import { Button } from './Button';
+
+    const meta = {
+      component: Button,
+      // 👇 このファイル内のすべてのストーリーに 'stable' を適用
+      tags: ['stable'],
+    } satisfies Meta<typeof Button>;
+
+    export default meta;
+    type Story = StoryObj<typeof meta>;
+
+    export const ExperimentalFeatureStory: Story = {
+      //👇 継承された 'stable' タグを削除し、代わりに 'experimental' を適用
+      tags: ['!stable', 'experimental'],
+    };
+    ```
+  </TabItem>
+</Tabs>
+
+## カスタムタグによるフィルタリング
+
+組み込みタグに加えて、独自の**カスタムタグ**を作成し、より柔軟な分類レイヤーを追加できます。<br />
+これは、Storybookのサイドバー階層の上に**カテゴリ化**のレイヤーを提供します。
+
+利用例は公式ドキュメントを参照してください。
+
+<LinkCard
+  title="Filtering by custom tags"
+  href="https://storybook.js.org/docs/9/writing-stories/tags#filtering-by-custom-tags"
+  target={'_blank'} />
+
+## よくある利用例（レシピ）
+
+### 1\. ドキュメント専用ストーリー（`autodocs`と`!dev`）
+
+ドキュメントの目的で例となるストーリーを提供しつつ、開発用のサイドバーナビゲーションを整理したい場合に、この設定が有効です。
+
+`autodocs`タグを有効にし、`dev`タグを削除（除外）することで、ストーリーは**ドキュメントページにのみ表示**され、サイドバーには表示されなくなります。
+
+<Tabs>
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript
+    // button.stories.js
+    import { Button } from './Button';
+
+    export default {
+      component: Button,
+      /*
+      * All stories in this file will:
+      * - Be included in the docs page
+      * - Not appear in Storybook's sidebar
+      */
+      tags: ['autodocs', '!dev'],
+    };
+    ```
+  </TabItem>
+  <TabItem label="TypeScript" icon="seti:typescript">
+    ```typescript
+    // button.stories.ts
+    // Replace your-framework with the framework you are using, e.g. react-vite, nextjs, vue3-vite, etc.
+    import type { Meta } from '@storybook/your-framework';
+
+    import { Button } from './Button';
+
+    const meta = {
+      component: Button,
+      /*
+      * All stories in this file will:
+      * - Be included in the docs page
+      * - Not appear in Storybook's sidebar
+      */
+      tags: ['autodocs', '!dev'],
+    } satisfies Meta<typeof Button>;
+    export default meta;
+    ```
+  </TabItem>
+</Tabs>
+
+### 2\. コンボストーリーと個別テストの組み合わせ（`!dev`と`!test`）
+
+複数のバリエーションをまとめて表示する「コンボ」ストーリーと、個々のバリエーションをテストするためのストーリーを使い分けたい場合の例です。
+
+  * 個々のバリアントストーリーには、`!dev`と`!autodocs`を適用し、サイドバーやドキュメントから**非表示**にします。
+  * コンボストーリーには、`!test`を適用し、テスト実行から**除外**します。
+
+<Aside type="caution" title="注意">このスニペットはHTML用には存在しません。<br />代わりに、Reactのスニペットを以下に示します。</Aside>
+
+```jsx
+// button.stories.jsx
+export const Variant1: Story = {
+  // 👇 サイドバーやドキュメントページに表示されない
+  tags: ['!dev', '!autodocs'],
+  args: { variant: 1 },
+};
+// ... (Variant2も同様)
+
+export const Combo: Story = {
+  // 👇 テスト実行から除外されるが、サイドバーとドキュメントページには表示される
+  tags: ['!test'],
+  render: () => (
+    <>
+      <Button variant={1} />
+      <Button variant={2} />
+    </>
+  ),
+};
+```
+
+<div
+  style="margin-block-start: 48px;">
+  <LinkCard
+    title="Storybook Tags Docs"
+    href="https://storybook.js.org/docs/9/writing-stories/tags"
+    target={'_blank'} />
+</div>
