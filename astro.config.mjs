@@ -19,6 +19,7 @@ export default defineConfig({
             { label: 'Play function', slug: 'stories/playfunction' },
             { label: 'Loaders', slug: 'stories/loaders' },
             { label: 'Tags', slug: 'stories/tags' },
+            { label: 'Naming components and hierarchy', slug: 'stories/naming-components-and-hierarchy' },
           ],
         },
         {

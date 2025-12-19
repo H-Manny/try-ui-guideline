@@ -1,0 +1,167 @@
+---
+title: Naming components and hierarchy
+description: Storybook v9 におけるストーリーの整理、サイドバーの階層化、および命名規則に関する詳細なガイド。
+---
+import { LinkCard } from '@astrojs/starlight/components';
+import { Aside } from '@astrojs/starlight/components';
+import { Badge } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## 構造と階層
+
+Storybook v9では、ストーリーを整理するために「暗黙的」と「明示的」の2つの手法が提供されています。これらを活用することで、組織のニーズに合わせた検索・フィルタリングしやすい構造を構築できます。
+
+* **暗黙的な方法**: ストーリーファイルの物理的なファイルパスに基づいて、サイドバー上の位置を自動的に決定します。
+* **明示的な方法**: `title` パラメータを使用して、サイドバー上の位置を直接定義します。
+
+参照: [Structure and hierarchy](https://storybook.js.org/docs/9/writing-stories/naming-components-and-hierarchy#structure-and-hierarchy)
+
+## サイドバーの階層構造
+
+Storybookのサイドバーは、以下の構成要素で成り立っています。
+
+1. **カテゴリ (Category)**: ストーリーやドキュメントをまとめる最上位のグループ。
+2. **フォルダ (Folder)**: 特定の機能やセクションを表す中間レベルのユニット。
+3. **コンポーネント (Component)**: ストーリーがテスト対象とする最小単位のコンポーネント。
+4. **ドキュメント (Docs)**: コンポーネントに対して自動生成されるドキュメントページ。
+5. **ストーリー (Story)**: コンポーネントの特定の状態（State）を定義したもの。
+
+## コンポーネントのグループ化
+
+`title` プロパティ内でスラッシュ（`/`）を区切り文字として使用することで、コンポーネントを階層的にグループ化できます。
+
+<Tabs>
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript
+    // Button.stories.js
+    import { Button } from './Button';
+
+    export default {
+      /* 👇 The title prop is optional.
+      * See https://storybook.js.org/docs/configure/#configure-story-loading
+      * to learn how to generate automatic titles
+      */
+      title: 'Design System/Atoms/Button',
+      component: Button,
+    };
+    ```
+  </TabItem>
+  <TabItem label="TypeScript" icon="seti:typescript">
+    ```typescript
+    // Button.stories.ts
+    import type { Meta } from '@storybook/react';
+    import { Button } from './Button';
+
+    const meta = {
+      /* スラッシュを使用して階層を定義 */
+      title: 'Design System/Atoms/Button',
+      component: Button,
+    } satisfies Meta<typeof Button>;
+
+    export default meta;
+    ```
+  </TabItem>
+</Tabs>
+
+## Roots
+
+デフォルトでは、最上位のグループは大文字の **ルート** としてUI上に表示されます。<br />
+これらは展開不可能な固定見出しとして機能しますが、プロジェクトの規模に応じて設定で無効化することも可能です。
+
+## Single-story hoisting
+
+兄弟要素を持たない単一のストーリーで、その名前がコンポーネント名（`title` の末尾部分）と完全に一致する場合、サイドバー上で親コンポーネントを置き換える形で自動的に **ホイスティング（繰り上げ）** されます。
+
+<Tabs>
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript
+    // Button.stories.js
+    import { Button as ButtonComponent } from './Button';
+
+    export default {
+      /* 👇 The title prop is optional.
+      * See https://storybook.js.org/docs/configure/#configure-story-loading
+      * to learn how to generate automatic titles
+      */
+      title: 'Design System/Atoms/Button',
+      component: ButtonComponent,
+    };
+
+    // This is the only named export in the file, and it matches the component name
+    export const Button = {};
+    ```
+  </TabItem>
+  <TabItem label="TypeScript" icon="seti:typescript">
+    ```typescript
+    // Button.stories.ts
+    const meta = {
+      title: 'Design System/Atoms/Button',
+      component: ButtonComponent,
+    } satisfies Meta<typeof ButtonComponent>;
+
+    export default meta;
+
+    // エクスポート名がコンポーネント名と一致する場合、UI上で上位に表示される
+    export const Button = {};
+    ```
+  </TabItem>
+</Tabs>
+
+## ストーリーのソート
+
+デフォルトの表示順はインポート順ですが、`.storybook/preview.ts` の `storySort` パラメータを使用して、表示順序を柔軟にカスタマイズできます。
+
+<Tabs>
+  <TabItem label="JavaScript" icon="seti:javascript">
+    ```javascript
+    // .storybook/preview.js
+    export default {
+      parameters: {
+        options: {
+          storySort: {
+            method: 'alphabetical', // アルファベット順にソート
+            order: ['Intro', 'Pages', ['Home', 'Login', 'Admin'], 'Components', '*', 'WIP'],
+            locales: 'ja-JP',
+          },
+        },
+      },
+    };
+    ```
+  </TabItem>
+  <TabItem label="TypeScript" icon="seti:typescript">
+    ```typescript
+    // .storybook/preview.ts
+    import type { Preview } from '@storybook/react';
+
+    const preview: Preview = {
+      parameters: {
+        options: {
+          storySort: {
+            method: 'alphabetical', // アルファベット順にソート
+            order: ['Intro', 'Pages', ['Home', 'Login', 'Admin'], 'Components', '*', 'WIP'],
+            locales: 'ja-JP',
+          },
+        },
+      },
+    };
+
+    export default preview;
+    ```
+  </TabItem>
+</Tabs>
+
+* **method**: `alphabetical` を指定すると、名前順で並び替えます。
+* **order**: 配列で特定の順序を指定します。入れ子になった配列でサブレベルの順序も定義可能です。
+* **`*` (ワイルドカード)**: リストに明示されていない他のすべてのストーリーが表示される位置を指定します。
+
+<Aside>`order`オプションは`method`オプションとは独立しています。<br />storiesは、まずorder配列でソートされ、次にmethodの「alphabetical」（アルファベット順）またはデフォルトの`configure()`インポート順でソートされます。</Aside>
+
+
+
+<div
+  style="margin-block-start: 48px;">
+  <LinkCard
+    title="Storybook Naming components and hierarchy Docs"
+    href="https://storybook.js.org/docs/9/writing-stories/naming-components-and-hierarchy"
+    target={'_blank'} />
+</div>
